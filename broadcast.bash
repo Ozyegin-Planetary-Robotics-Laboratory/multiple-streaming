@@ -58,7 +58,7 @@ unset clients[-1]
 for d in "${!video_files[@]}"; do
     
     if [[ "${matched_words[d]}" == "ZED" ]] && (( d % 2 == 0 )); then
-        command_root="gst-launch-1.0 -e v4l2src device=${video_files[d]} ! videoconvert ! \
+        command_root="gst-launch-1.0 -e v4l2src device=${video_files[d]} ! videoconvert ! videocrop right=2208 ! videoconvert ! \
             x264enc tune=zerolatency bitrate=1000 speed-preset=superfast ! h264parse ! tee name=sibel ! \
             "
         for target_ip in "${clients[@]}"
@@ -67,8 +67,8 @@ for d in "${!video_files[@]}"; do
         done
 
         command_root+="queue ! rtph264pay config-interval=10 pt=96 ! udpsink host=$last_ip port=${target_ports[1]} > log/zed.log 2>&1  &"
-
-        eval $command_root
+        
+	eval $command_root
     fi
     if [[ "${matched_words[d]}" == "lenovo" ]] && (( d % 2 == 0 )); then
         command_root="gst-launch-1.0 -e v4l2src device=${video_files[d]} ! videoconvert ! \
